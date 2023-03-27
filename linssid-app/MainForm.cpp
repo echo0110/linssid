@@ -1305,10 +1305,20 @@ void MainForm::readPingOutput() {
     QString output = pingProcess->readAllStandardOutput();
     qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
     pingOutputTextEdit->append(output);
+
+    // Parse ping output to determine whether the device is online
+    if (output.contains("Destination Host Unreachable") || output.contains("Request timed out") || output.contains("100% packet loss")) {
+        onlineStatusLabel->setText("Device is offline");
+        onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+    } else {
+        onlineStatusLabel->setText("Device is online");
+        onlineStatusLabel->setStyleSheet("QLabel { color : green; }");
+    }
 }
 
 
 void MainForm::handleError(QProcess::ProcessError error) {
     qDebug() << "Error occurred:" << error;
     onlineStatusLabel->setText("Ping process error: " + QString::number(error));
+    onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
 }
