@@ -116,6 +116,14 @@ int MainForm::columnWidth[MAX_TABLE_COLS]; // since Qt doesn't see fit to rememb
 MainForm::MainForm() {
 
     mainFormWidget.setupUi(this);
+
+     // Create QLabel for online status
+    onlineStatusLabel = new QLabel(this);
+    onlineStatusLabel->setObjectName("onlineStatusLabel");
+
+    // Add QLabel to the status bar
+    mainFormWidget.statusbar->addPermanentWidget(onlineStatusLabel);
+
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
     connect(mainFormWidget.allBtn, SIGNAL(clicked()), this, SLOT(doPlotAll()));
@@ -170,6 +178,10 @@ MainForm::MainForm() {
     lastBlockReceived = 0;
     startTime = QDateTime::currentMSecsSinceEpoch();
     firstScan_ = true;
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateOnlineStatus()));
+    timer->start(1000); // Update the online status every second
 }
 
 MainForm::~MainForm() {
@@ -1110,4 +1122,16 @@ void MainForm::handleDataReadyEvent(const DataReadyEvent * /*event*/) {
             }
         }
     }
+}
+
+void MainForm::updateOnlineStatus() {
+    QProcess pingProcess;
+    QString command = "ping -c 1 <gateway>"; // replace <gateway> with your gateway address
+    pingProcess.start(command);
+    pingProcess.waitForFinished(-1);
+    QString output = pingProcess.readAllStandardOutput();
+    bool online = output.contains("1 packets transmitted, 1 received");
+    // Update the UI with the online status
+    // Replace `onlineStatusLabel` with the actual QLabel object in your UI
+    mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
 }

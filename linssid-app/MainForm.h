@@ -87,8 +87,9 @@ public slots:
     void columnWidthSave(int, int, int);
     void updatePlotPrefs(QString, int, int, bool, bool);
     void logPrefChanged(int);
+    void updateOnlineStatus();
 
-protected:
+private:
     Ui::mainForm mainFormWidget;
     void customEvent(QEvent*) override;
     void closeEvent(QCloseEvent*) override;
@@ -124,6 +125,8 @@ private:
     long now_; // absolute time of the block
     CellData::Vector cellDataRay_; // The data table
     int maxTableIndex_; // holds the highest index pointer into cellData
+private:
+    QLabel* onlineStatusLabel;
 };
 
 #endif	/* _MAINFORM_H */
