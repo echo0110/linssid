@@ -21,6 +21,7 @@
 #include "ui_MainForm.h"
 #include "Custom.h"
 #include "DataStruct.h"
+#include <QProcess>
 
 // forward declare
 class DataLogger;
@@ -88,6 +89,7 @@ public slots:
     void updatePlotPrefs(QString, int, int, bool, bool);
     void logPrefChanged(int);
     void updateOnlineStatus();
+    void readPingOutput();
 
 private:
     Ui::mainForm mainFormWidget;
@@ -127,6 +129,8 @@ private:
     int maxTableIndex_; // holds the highest index pointer into cellData
 private:
     QLabel* onlineStatusLabel;
+    QLineEdit *gatewayLineEdit;
+    QProcess *pingProcess;
 };
 
 #endif	/* _MAINFORM_H */

@@ -124,6 +124,25 @@ MainForm::MainForm() {
     // Add QLabel to the status bar
     mainFormWidget.statusbar->addPermanentWidget(onlineStatusLabel);
 
+
+     // Create QLineEdit for gateway input
+    gatewayLineEdit = new QLineEdit(this);
+    gatewayLineEdit->setObjectName("gatewayLineEdit");
+    gatewayLineEdit->setPlaceholderText("Enter gateway address");
+
+    // Add QLineEdit to the layout
+    //mainFormWidget.gridLayout->addWidget(gatewayLineEdit, 20, 0); // Adjust the position as needed
+
+    // Add QLineEdit and QLabel to the layout
+    mainFormWidget.gridLayout->addWidget(gatewayLineEdit, 0, 0); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(onlineStatusLabel, 0, 1); // Adjust the position as needed
+
+
+
+     // Initialize QProcess for ping
+    pingProcess = new QProcess(this);
+    connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
     connect(mainFormWidget.allBtn, SIGNAL(clicked()), this, SLOT(doPlotAll()));
@@ -1125,9 +1144,17 @@ void MainForm::handleDataReadyEvent(const DataReadyEvent * /*event*/) {
 }
 
 void MainForm::updateOnlineStatus() {
+
+    QString gateway = gatewayLineEdit->text();
+    if (gateway.isEmpty()) {
+        onlineStatusLabel->setText("No gateway set");
+        return;
+    }
+
     QProcess pingProcess;
     //QString command = "ping -c 1 <gateway>"; // replace <gateway> with your gateway address
-    QString command = "ping -c 1 10.12.7.254";
+    //QString command = "ping -c 1 10.12.7.254";
+    QString command = QString("ping -c 1 %1").arg(gateway);
     pingProcess.start(command);
     pingProcess.waitForFinished(-1);
     QString output = pingProcess.readAllStandardOutput();
@@ -1136,3 +1163,20 @@ void MainForm::updateOnlineStatus() {
     // Replace `onlineStatusLabel` with the actual QLabel object in your UI
     mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
 }
+
+void MainForm::readPingOutput() {
+    QString output = pingProcess->readAllStandardOutput();
+    if (output.contains("1 packets transmitted, 1 received")) {
+        onlineStatusLabel->setText("Online");
+    } else {
+        onlineStatusLabel->setText("Offline");
+    }
+}
+
+// void MainForm::createGatewayInputField() {
+//     QLineEdit *gatewayInputField = new QLineEdit(this);
+//     gatewayInputField->setPlaceholderText("Enter gateway address here");
+//     // Add the input field to your UI layout
+//     // For example, if you have a QVBoxLayout named layout:
+//     // layout->addWidget(gatewayInputField);
+// }
