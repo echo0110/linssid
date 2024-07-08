@@ -22,6 +22,7 @@
 #include "Custom.h"
 #include "DataStruct.h"
 #include <QProcess>
+#include <QTextEdit>
 
 // forward declare
 class DataLogger;
@@ -131,6 +132,7 @@ private:
     QLabel* onlineStatusLabel;
     QLineEdit *gatewayLineEdit;
     QProcess *pingProcess;
+    QTextEdit *pingOutputTextEdit;
 };
 
 #endif	/* _MAINFORM_H */
