@@ -53,8 +53,8 @@
       </property>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0" colspan="2">
-        <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0,0,0,0,0,0,0">
-         <item row="0" column="11">
+        <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
+         <item row="0" column="12">
           <widget class="QSlider" name="napTimeSlider">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -91,7 +91,36 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="11">
+         <item row="1" column="3">
+          <widget class="QLabel" name="interfaceLbl">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Interface</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5">
+          <widget class="QLabel" name="statusLbl">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Status</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="12">
           <widget class="QLabel" name="napTimeLbl">
            <property name="minimumSize">
             <size>
@@ -107,20 +136,67 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="10">
-          <widget class="QLabel" name="graphLbl">
-           <property name="toolTip">
-            <string>Select or deselect all visible APs</string>
+         <item row="1" column="4">
+          <widget class="QLabel" name="runLbl">
+           <property name="baseSize">
+            <size>
+             <width>52</width>
+             <height>20</height>
+            </size>
            </property>
            <property name="text">
-            <string>Plot</string>
+            <string>Run</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="10">
+         <item row="0" column="3">
+          <widget class="QComboBox" name="interfaceCbx">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>27</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Select a wireless interface if you have more than one</string>
+           </property>
+           <item>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="0" column="1" rowspan="2">
+          <widget class="QLabel" name="linssidLogoMainframe">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap>../../../../../../../usr/share/pixmaps/linssid.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="statusTxt">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Paused</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="11">
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QPushButton" name="allBtn">
@@ -174,7 +250,49 @@
            </item>
           </layout>
          </item>
-         <item row="0" column="9">
+         <item row="0" column="4">
+          <widget class="QPushButton" name="runBtn">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>52</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>52</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Start or stop run mode</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../../../../../../usr/share/linssid/start.png</normaloff>
+             <normalon>../../../../../../../usr/share/linssid/pause.png</normalon>../../../../../../../usr/share/linssid/start.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="10">
           <widget class="QPushButton" name="filterBtn">
            <property name="enabled">
             <bool>true</bool>
@@ -218,7 +336,20 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="9">
+         <item row="1" column="11">
+          <widget class="QLabel" name="graphLbl">
+           <property name="toolTip">
+            <string>Select or deselect all visible APs</string>
+           </property>
+           <property name="text">
+            <string>Plot</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="10">
           <widget class="QLabel" name="filterLbl">
            <property name="minimumSize">
             <size>
@@ -234,134 +365,10 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="4">
-          <widget class="QLabel" name="statusLbl">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="onlineStatusLabel">
            <property name="text">
-            <string>Status</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="4">
-          <widget class="QLabel" name="statusTxt">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Paused</string>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QPushButton" name="runBtn">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>52</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>52</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Start or stop run mode</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>../../../../../../../usr/share/linssid/start.png</normaloff>
-             <normalon>../../../../../../../usr/share/linssid/pause.png</normalon>../../../../../../../usr/share/linssid/start.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="runLbl">
-           <property name="baseSize">
-            <size>
-             <width>52</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Run</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="interfaceLbl">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Interface</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QComboBox" name="interfaceCbx">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Select a wireless interface if you have more than one</string>
-           </property>
-           <item>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="0" column="0" rowspan="2">
-          <widget class="QLabel" name="linssidLogoMainframe">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap>../../../../../../../usr/share/pixmaps/linssid.png</pixmap>
+            <string>TextLabel</string>
            </property>
           </widget>
          </item>
@@ -467,19 +474,6 @@
              <height>100</height>
             </size>
            </property>
-           <widget class="QLabel" name="onlineStatusLabel">
-            <property name="geometry">
-             <rect>
-              <x>906</x>
-              <y>70</y>
-              <width>171</width>
-              <height>81</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
           </widget>
          </item>
         </layout>

@@ -1126,7 +1126,8 @@ void MainForm::handleDataReadyEvent(const DataReadyEvent * /*event*/) {
 
 void MainForm::updateOnlineStatus() {
     QProcess pingProcess;
-    QString command = "ping -c 1 <gateway>"; // replace <gateway> with your gateway address
+    //QString command = "ping -c 1 <gateway>"; // replace <gateway> with your gateway address
+    QString command = "ping -c 1 10.12.7.254";
     pingProcess.start(command);
     pingProcess.waitForFinished(-1);
     QString output = pingProcess.readAllStandardOutput();
