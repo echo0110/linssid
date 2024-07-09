@@ -147,9 +147,9 @@ MainForm::MainForm() {
 
 
 
-     // Initialize QProcess for ping
-    // pingProcess = new QProcess(this);
-    // connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    //Initialize QProcess for ping
+    pingProcess = new QProcess(this);
+    connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
 
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
