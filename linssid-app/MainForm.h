@@ -91,7 +91,8 @@ public slots:
     void logPrefChanged(int);
     void updateOnlineStatus();
     void readPingOutput();
-
+    void updateNetworkInfo();
+    void startPing();
 private:
     Ui::mainForm mainFormWidget;
     void customEvent(QEvent*) override;
@@ -133,6 +134,10 @@ private:
     QLineEdit *gatewayLineEdit;
     QProcess *pingProcess;
     QTextEdit *pingOutputTextEdit;
+    QProcess *networkInfoProcess;
+    QPushButton *pingButton;
+    QLabel *ssidLabel;
+    QLabel *bssidLabel;
 };
 
 #endif	/* _MAINFORM_H */

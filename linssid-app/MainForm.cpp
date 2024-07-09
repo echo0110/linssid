@@ -136,20 +136,50 @@ MainForm::MainForm() {
     pingOutputTextEdit->setObjectName("pingOutputTextEdit");
     pingOutputTextEdit->setReadOnly(true);
 
+    // Create QPushButton for starting ping
+    pingButton = new QPushButton("Start Ping", this);
+    pingButton->setObjectName("pingButton");
+
+    // Create QLabel for SSID and BSSID
+    ssidLabel = new QLabel(this);
+    ssidLabel->setObjectName("ssidLabel");
+    ssidLabel->setText("SSID: Unknown");
+
+    bssidLabel = new QLabel(this);
+    bssidLabel->setObjectName("bssidLabel");
+    bssidLabel->setText("BSSID: Unknown");
+
     // Add QLineEdit to the layout
     //mainFormWidget.gridLayout->addWidget(gatewayLineEdit, 20, 0); // Adjust the position as needed
 
     // Add QLineEdit and QLabel to the layout
+    // mainFormWidget.gridLayout->addWidget(gatewayLineEdit, 0, 0); // Adjust the position as needed
+    // mainFormWidget.gridLayout->addWidget(onlineStatusLabel, 1, 0); // Adjust the position as needed
+
+    // mainFormWidget.gridLayout->addWidget(pingOutputTextEdit, 2, 0); // Adjust the position as needed
+
+
+    // Add QLineEdit, QLabel, QTextEdit, and QPushButton to the layout
     mainFormWidget.gridLayout->addWidget(gatewayLineEdit, 0, 0); // Adjust the position as needed
-    mainFormWidget.gridLayout->addWidget(onlineStatusLabel, 1, 0); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(onlineStatusLabel, 0, 1); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(pingOutputTextEdit, 1, 0, 1, 2); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(pingButton, 2, 0, 1, 2); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(ssidLabel, 3, 0, 1, 2); // Adjust the position as needed
+    mainFormWidget.gridLayout->addWidget(bssidLabel, 4, 0, 1, 2); // Adjust the position as needed
 
-    mainFormWidget.gridLayout->addWidget(pingOutputTextEdit, 2, 0); // Adjust the position as needed
 
+    
 
-
-    //Initialize QProcess for ping
+    // Initialize QProcess for ping
     pingProcess = new QProcess(this);
     connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+
+    // Initialize QProcess for network info
+    networkInfoProcess = new QProcess(this);
+    connect(networkInfoProcess, &QProcess::readyReadStandardOutput, this, &MainForm::updateNetworkInfo);
+
+    // Connect button click to startPing function
+    connect(pingButton, &QPushButton::clicked, this, &MainForm::startPing);
 
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
@@ -209,6 +239,11 @@ MainForm::MainForm() {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateOnlineStatus()));
     timer->start(1000); // Update the online status every second
+
+    // Start network info update
+    QTimer *networkInfoTimer = new QTimer(this);
+    connect(networkInfoTimer, SIGNAL(timeout()), this, SLOT(updateNetworkInfo()));
+    networkInfoTimer->start(5000); // Update network info every 5 seconds
 }
 
 MainForm::~MainForm() {
@@ -1171,6 +1206,42 @@ void MainForm::updateOnlineStatus() {
     // Replace `onlineStatusLabel` with the actual QLabel object in your UI
     mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
 }
+
+
+void MainForm::updateNetworkInfo() {
+    networkInfoProcess->start("iwgetid --raw");
+    networkInfoProcess->waitForFinished();
+    QString ssid = networkInfoProcess->readAllStandardOutput().trimmed();
+    ssidLabel->setText("SSID: " + ssid);
+
+    networkInfoProcess->start("iw dev wlan0 link");
+    networkInfoProcess->waitForFinished();
+    QString output = networkInfoProcess->readAllStandardOutput();
+    QRegExp bssidRegex("Connected to ([0-9A-Fa-f:]{17})");
+    if (bssidRegex.indexIn(output) != -1) {
+        QString bssid = bssidRegex.cap(1);
+        bssidLabel->setText("BSSID: " + bssid);
+    } else {
+        bssidLabel->setText("BSSID: Unknown");
+    }
+
+    // Check if the device is offline
+    if (ssid.isEmpty() || bssidLabel->text() == "BSSID: Unknown") {
+        onlineStatusLabel->setText("Device Offline");
+    }
+}
+
+void MainForm::startPing() {
+    QString gateway = gatewayLineEdit->text();
+    if (gateway.isEmpty()) {
+        onlineStatusLabel->setText("No gateway set");
+        return;
+    }
+
+    QString command = QString("ping -t %1").arg(gateway);
+    pingProcess->start(command);
+}
+
 
 // void MainForm::readPingOutput() {
 //     QString output = pingProcess->readAllStandardOutput();
