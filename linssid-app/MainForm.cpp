@@ -171,8 +171,8 @@ MainForm::MainForm() {
     
 
     // Initialize QProcess for ping
-    pingProcess = new QProcess(this);
-    connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    // pingProcess = new QProcess(this);
+    // connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
 
     // Initialize QProcess for network info
     networkInfoProcess = new QProcess(this);
@@ -244,6 +244,19 @@ MainForm::MainForm() {
     QTimer *networkInfoTimer = new QTimer(this);
     connect(networkInfoTimer, SIGNAL(timeout()), this, SLOT(updateNetworkInfo()));
     networkInfoTimer->start(5000); // Update network info every 5 seconds
+
+
+    // Initialize wireless interface
+    QProcess dmesgProcess;
+    dmesgProcess.start("dmesg | grep wlan0");
+    dmesgProcess.waitForFinished();
+    QString dmesgOutput = dmesgProcess.readAllStandardOutput();
+    QRegExp interfaceRegex("renamed from wlan0");
+    if (interfaceRegex.indexIn(dmesgOutput) != -1) {
+        wirelessInterface = interfaceRegex.cap(1);
+    } else {
+        wirelessInterface = "wlan0"; // Default to wlan0 if not found
+    }
 }
 
 MainForm::~MainForm() {
@@ -1194,20 +1207,47 @@ void MainForm::updateOnlineStatus() {
         return;
     }
 
-    QProcess pingProcess;
-    //QString command = "ping -c 1 <gateway>"; // replace <gateway> with your gateway address
-    //QString command = "ping -c 1 10.12.7.254";
+   // QProcess pingProcess;
+    qDebug() << "Gateway:" << gateway;
     QString command = QString("ping -c 1 %1").arg(gateway);
-    pingProcess.start(command);
-    pingProcess.waitForFinished(-1);
-    QString output = pingProcess.readAllStandardOutput();
-    bool online = output.contains("1 packets transmitted, 1 received");
+    qDebug() << "command:" << command;
+    //pingProcess.start(command);
+    //pingProcess.waitForFinished(-1);
+    //QString output = pingProcess.readAllStandardOutput();
+    //bool online = output.contains("1 packets transmitted, 1 received");
     // Update the UI with the online status
     // Replace `onlineStatusLabel` with the actual QLabel object in your UI
-    mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
+
+    //qDebug() << "online:" << online;
+    //mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
+}
+
+void MainForm::updateNetworkInfo() {
+    // networkInfoProcess->start("iwgetid --raw");
+    // networkInfoProcess->waitForFinished();
+    // QString ssid = networkInfoProcess->readAllStandardOutput().trimmed();
+    // ssidLabel->setText("SSID: " + ssid);
+
+    // QString command = QString("iw dev %1 link").arg(wirelessInterface);
+    // networkInfoProcess->start(command);
+    // networkInfoProcess->waitForFinished();
+    // QString output = networkInfoProcess->readAllStandardOutput();
+    // QRegExp bssidRegex("Connected to ([0-9A-Fa-f:]{17})");
+    // if (bssidRegex.indexIn(output) != -1) {
+    //     QString bssid = bssidRegex.cap(1);
+    //     bssidLabel->setText("BSSID: " + bssid);
+    // } else {
+    //     bssidLabel->setText("BSSID: Unknown");
+    // }
+
+    // // Check if the device is offline
+    // if (ssid.isEmpty() || bssidLabel->text() == "BSSID: Unknown") {
+    //     onlineStatusLabel->setText("Device Offline");
+    // }
 }
 
 
+#if 0
 void MainForm::updateNetworkInfo() {
     networkInfoProcess->start("iwgetid --raw");
     networkInfoProcess->waitForFinished();
@@ -1230,7 +1270,7 @@ void MainForm::updateNetworkInfo() {
         onlineStatusLabel->setText("Device Offline");
     }
 }
-
+#endif
 void MainForm::startPing() {
     QString gateway = gatewayLineEdit->text();
     if (gateway.isEmpty()) {
@@ -1239,7 +1279,8 @@ void MainForm::startPing() {
     }
 
     QString command = QString("ping -t %1").arg(gateway);
-    pingProcess->start(command);
+    qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
+    //networkInfoProcess->start(command);
 }
 
 
@@ -1260,13 +1301,13 @@ void MainForm::startPing() {
 //     // layout->addWidget(gatewayInputField);
 // }
 
-void MainForm::readPingOutput() {
-    QString output = pingProcess->readAllStandardOutput();
-    pingOutputTextEdit->append(output);
+// void MainForm::readPingOutput() {
+//     QString output = pingProcess->readAllStandardOutput();
+//     pingOutputTextEdit->append(output);
 
-    if (output.contains("1 packets transmitted, 1 received")) {
-        onlineStatusLabel->setText("Online");
-    } else {
-        onlineStatusLabel->setText("Offline");
-    }
-}
+//     if (output.contains("1 packets transmitted, 1 received")) {
+//         onlineStatusLabel->setText("Online");
+//     } else {
+//         onlineStatusLabel->setText("Offline");
+//     }
+// }
