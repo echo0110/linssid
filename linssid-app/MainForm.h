@@ -90,7 +90,7 @@ public slots:
     void updatePlotPrefs(QString, int, int, bool, bool);
     void logPrefChanged(int);
     void updateOnlineStatus();
-   // void readPingOutput();
+    void readPingOutput();
     void updateNetworkInfo();
     void startPing();
 private:
@@ -132,7 +132,7 @@ private:
 private:
     QLabel* onlineStatusLabel;
     QLineEdit *gatewayLineEdit;
-   // QProcess *pingProcess;
+    QProcess *pingProcess;
     QTextEdit *pingOutputTextEdit;
     QProcess *networkInfoProcess;
     QPushButton *pingButton;

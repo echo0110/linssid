@@ -171,8 +171,8 @@ MainForm::MainForm() {
     
 
     // Initialize QProcess for ping
-    // pingProcess = new QProcess(this);
-    // connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    pingProcess = new QProcess(this);
+    connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
 
     // Initialize QProcess for network info
     networkInfoProcess = new QProcess(this);
@@ -1191,16 +1191,16 @@ void MainForm::handleDataReadyEvent(const DataReadyEvent * /*event*/) {
 
 void MainForm::updateOnlineStatus() {
 
-    QString gateway = gatewayLineEdit->text();
-    if (gateway.isEmpty()) {
-        onlineStatusLabel->setText("No gateway set");
-        return;
-    }
+    // QString gateway = gatewayLineEdit->text();
+    // if (gateway.isEmpty()) {
+    //     onlineStatusLabel->setText("No gateway set");
+    //     return;
+    // }
 
    // QProcess pingProcess;
-    qDebug() << "Gateway:" << gateway;
-    QString command = QString("ping -c 1 %1").arg(gateway);
-    qDebug() << "command:" << command;
+    // qDebug() << "Gateway:" << gateway;
+    // QString command = QString("ping -c 1 %1").arg(gateway);
+    // qDebug() << "command:" << command;
     //pingProcess.start(command);
     //pingProcess.waitForFinished(-1);
     //QString output = pingProcess.readAllStandardOutput();
@@ -1293,27 +1293,32 @@ void MainForm::updateNetworkInfo() {
     }
 }
 #endif
+
+
 void MainForm::startPing() {
     QString gateway = gatewayLineEdit->text();
     if (gateway.isEmpty()) {
         onlineStatusLabel->setText("No gateway set");
         return;
     }
-
+    //QProcess *pingProcess;
     QString command = QString("ping -t %1").arg(gateway);
     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
-    //networkInfoProcess->start(command);
+    //connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    pingProcess->start(command);
 }
 
 
+void MainForm::readPingOutput() {
+    QString output = pingProcess->readAllStandardOutput();
+    pingOutputTextEdit->append(output);
+}
+
 // void MainForm::readPingOutput() {
 //     QString output = pingProcess->readAllStandardOutput();
-//     if (output.contains("1 packets transmitted, 1 received")) {
-//         onlineStatusLabel->setText("Online");
-//     } else {
-//         onlineStatusLabel->setText("Offline");
-//     }
+    
 // }
+
 
 // void MainForm::createGatewayInputField() {
 //     QLineEdit *gatewayInputField = new QLineEdit(this);
