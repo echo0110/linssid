@@ -246,17 +246,7 @@ MainForm::MainForm() {
     networkInfoTimer->start(5000); // Update network info every 5 seconds
 
 
-    // Initialize wireless interface
-    QProcess dmesgProcess;
-    dmesgProcess.start("dmesg | grep wlan0");
-    dmesgProcess.waitForFinished();
-    QString dmesgOutput = dmesgProcess.readAllStandardOutput();
-    QRegExp interfaceRegex("renamed from wlan0");
-    if (interfaceRegex.indexIn(dmesgOutput) != -1) {
-        wirelessInterface = interfaceRegex.cap(1);
-    } else {
-        wirelessInterface = "wlan0"; // Default to wlan0 if not found
-    }
+   
 }
 
 MainForm::~MainForm() {
@@ -1222,29 +1212,61 @@ void MainForm::updateOnlineStatus() {
     //mainFormWidget.onlineStatusLabel->setText(online ? "Online" : "Offline");
 }
 
+// void MainForm::updateNetworkInfo() {
+//     networkInfoProcess->start("iwgetid --raw");
+//     networkInfoProcess->waitForFinished();
+//     QString ssid = networkInfoProcess->readAllStandardOutput().trimmed();
+//     ssidLabel->setText("SSID: " + ssid);
+
+
+//     QString command = QString("iw dev %1 link").arg(wirelessInterface);
+//     networkInfoProcess->start(command);
+//     networkInfoProcess->waitForFinished();
+//     QString output = networkInfoProcess->readAllStandardOutput();
+//     QRegExp bssidRegex("Connected to ([0-9A-Fa-f:]{17})");
+//     if (bssidRegex.indexIn(output) != -1) {
+//         QString bssid = bssidRegex.cap(1);
+//         bssidLabel->setText("BSSID: " + bssid);
+//     } else {
+//         bssidLabel->setText("BSSID: Unknown");
+//     }
+
+//     // Check if the device is offline
+//     if (ssid.isEmpty() || bssidLabel->text() == "BSSID: Unknown") {
+//         onlineStatusLabel->setText("Device Offline");
+//     }
+// }
+
 void MainForm::updateNetworkInfo() {
-    // networkInfoProcess->start("iwgetid --raw");
-    // networkInfoProcess->waitForFinished();
-    // QString ssid = networkInfoProcess->readAllStandardOutput().trimmed();
-    // ssidLabel->setText("SSID: " + ssid);
+    QProcess process;
+    process.start("/home/gensong/linssid-ex-master/get_wifi_info.sh");
+    process.waitForFinished();
+    QString output = process.readAllStandardOutput();
 
-    // QString command = QString("iw dev %1 link").arg(wirelessInterface);
-    // networkInfoProcess->start(command);
-    // networkInfoProcess->waitForFinished();
-    // QString output = networkInfoProcess->readAllStandardOutput();
-    // QRegExp bssidRegex("Connected to ([0-9A-Fa-f:]{17})");
-    // if (bssidRegex.indexIn(output) != -1) {
-    //     QString bssid = bssidRegex.cap(1);
-    //     bssidLabel->setText("BSSID: " + bssid);
-    // } else {
-    //     bssidLabel->setText("BSSID: Unknown");
-    // }
+    QString ssid;
+    QString bssid;
 
-    // // Check if the device is offline
-    // if (ssid.isEmpty() || bssidLabel->text() == "BSSID: Unknown") {
-    //     onlineStatusLabel->setText("Device Offline");
-    // }
+    QStringList lines = output.split("\n");
+    for (const QString &line : lines) {
+        if (line.startsWith("SSID:")) {
+            ssid = line.section(':', 1, 1).trimmed();
+        } else if (line.startsWith("BSSID:")) {
+            bssid = line.section(':', 1, -1).trimmed();
+        }
+    }
+
+    ssidLabel->setText("SSID: " + ssid);
+    bssidLabel->setText("BSSID: " + bssid);
+
+    // Check if the device is offline
+    if (ssid.isEmpty() || bssid.isEmpty()) {
+        onlineStatusLabel->setText("Device Offline");
+    }
 }
+
+
+
+
 
 
 #if 0
