@@ -172,7 +172,18 @@ MainForm::MainForm() {
 
     // Initialize QProcess for ping
     pingProcess = new QProcess(this);
-    connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    // Connect the readyReadStandardOutput signal of pingProcess to the readPingOutput slot of MainForm
+    bool isConnected = connect(pingProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readPingOutput()));
+    if (isConnected) {
+        qDebug() << "Connection established.";
+    } else {
+        qDebug() << "Connection failed.";
+    }
+
+    // Check for errors
+    connect(pingProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(handleError(QProcess::ProcessError)));
+
+    // connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
 
     // Initialize QProcess for network info
     networkInfoProcess = new QProcess(this);
@@ -1295,23 +1306,64 @@ void MainForm::updateNetworkInfo() {
 #endif
 
 
+// void MainForm::startPing() {
+//     QString gateway = gatewayLineEdit->text();
+//     if (gateway.isEmpty()) {
+//         onlineStatusLabel->setText("No gateway set");
+//         return;
+//     }
+//     //QProcess *pingProcess;
+//     QString command = QString("ping -t %1").arg(gateway);
+//     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
+//     pingProcess->start(command);
+
+//      // Check if the process started successfully
+//     if (!pingProcess->waitForStarted()) {
+//         qDebug() << "Failed to start ping process.";
+//         return;
+//     }
+// }
 void MainForm::startPing() {
     QString gateway = gatewayLineEdit->text();
     if (gateway.isEmpty()) {
         onlineStatusLabel->setText("No gateway set");
         return;
     }
-    //QProcess *pingProcess;
-    QString command = QString("ping -t %1").arg(gateway);
+    QString command = QString("ping -c 4 %1\n").arg(gateway);
     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
-    //connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
     pingProcess->start(command);
+
+    if (!pingProcess->waitForStarted()) {
+        qDebug() << "Failed to start ping process.";
+        return;
+    } else {
+        qDebug() << "Ping process started successfully.";
+    }
 }
 
 
+// void MainForm::readPingOutput() {
+//     qDebug() << __func__ << "," << __LINE__ << "output is:";
+//     //QString output = pingProcess->readAllStandardOutput();
+//     QString output = pingProcess->readAll();
+//     qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
+//     pingOutputTextEdit->append(output);
+// }
+
+// void MainForm::handleError(QProcess::ProcessError error) {
+//     qDebug() << "Error occurred:" << error;
+// }
+
 void MainForm::readPingOutput() {
-    QString output = pingProcess->readAllStandardOutput();
+    qDebug() << __func__ << "," << __LINE__ << "output is:";
+    QString output = pingProcess->readAll();
+    qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
     pingOutputTextEdit->append(output);
+}
+
+void MainForm::handleError(QProcess::ProcessError error) {
+    qDebug() << "Error occurred:" << error;
+    onlineStatusLabel->setText("Ping process error: " + QString::number(error));
 }
 
 // void MainForm::readPingOutput() {
