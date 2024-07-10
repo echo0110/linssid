@@ -1280,56 +1280,14 @@ void MainForm::updateNetworkInfo() {
 
 
 
-#if 0
-void MainForm::updateNetworkInfo() {
-    networkInfoProcess->start("iwgetid --raw");
-    networkInfoProcess->waitForFinished();
-    QString ssid = networkInfoProcess->readAllStandardOutput().trimmed();
-    ssidLabel->setText("SSID: " + ssid);
 
-    networkInfoProcess->start("iw dev wlan0 link");
-    networkInfoProcess->waitForFinished();
-    QString output = networkInfoProcess->readAllStandardOutput();
-    QRegExp bssidRegex("Connected to ([0-9A-Fa-f:]{17})");
-    if (bssidRegex.indexIn(output) != -1) {
-        QString bssid = bssidRegex.cap(1);
-        bssidLabel->setText("BSSID: " + bssid);
-    } else {
-        bssidLabel->setText("BSSID: Unknown");
-    }
-
-    // Check if the device is offline
-    if (ssid.isEmpty() || bssidLabel->text() == "BSSID: Unknown") {
-        onlineStatusLabel->setText("Device Offline");
-    }
-}
-#endif
-
-
-// void MainForm::startPing() {
-//     QString gateway = gatewayLineEdit->text();
-//     if (gateway.isEmpty()) {
-//         onlineStatusLabel->setText("No gateway set");
-//         return;
-//     }
-//     //QProcess *pingProcess;
-//     QString command = QString("ping -t %1").arg(gateway);
-//     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
-//     pingProcess->start(command);
-
-//      // Check if the process started successfully
-//     if (!pingProcess->waitForStarted()) {
-//         qDebug() << "Failed to start ping process.";
-//         return;
-//     }
-// }
 void MainForm::startPing() {
     QString gateway = gatewayLineEdit->text();
     if (gateway.isEmpty()) {
         onlineStatusLabel->setText("No gateway set");
         return;
     }
-    QString command = QString("ping -c 4 %1\n").arg(gateway);
+    QString command = QString("ping %1").arg(gateway); // 不指定次数，持续ping
     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
     pingProcess->start(command);
 
@@ -1342,51 +1300,15 @@ void MainForm::startPing() {
 }
 
 
-// void MainForm::readPingOutput() {
-//     qDebug() << __func__ << "," << __LINE__ << "output is:";
-//     //QString output = pingProcess->readAllStandardOutput();
-//     QString output = pingProcess->readAll();
-//     qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
-//     pingOutputTextEdit->append(output);
-// }
-
-// void MainForm::handleError(QProcess::ProcessError error) {
-//     qDebug() << "Error occurred:" << error;
-// }
-
 void MainForm::readPingOutput() {
     qDebug() << __func__ << "," << __LINE__ << "output is:";
-    QString output = pingProcess->readAll();
+    QString output = pingProcess->readAllStandardOutput();
     qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
     pingOutputTextEdit->append(output);
 }
+
 
 void MainForm::handleError(QProcess::ProcessError error) {
     qDebug() << "Error occurred:" << error;
     onlineStatusLabel->setText("Ping process error: " + QString::number(error));
 }
-
-// void MainForm::readPingOutput() {
-//     QString output = pingProcess->readAllStandardOutput();
-    
-// }
-
-
-// void MainForm::createGatewayInputField() {
-//     QLineEdit *gatewayInputField = new QLineEdit(this);
-//     gatewayInputField->setPlaceholderText("Enter gateway address here");
-//     // Add the input field to your UI layout
-//     // For example, if you have a QVBoxLayout named layout:
-//     // layout->addWidget(gatewayInputField);
-// }
-
-// void MainForm::readPingOutput() {
-//     QString output = pingProcess->readAllStandardOutput();
-//     pingOutputTextEdit->append(output);
-
-//     if (output.contains("1 packets transmitted, 1 received")) {
-//         onlineStatusLabel->setText("Online");
-//     } else {
-//         onlineStatusLabel->setText("Offline");
-//     }
-// }
