@@ -1314,7 +1314,10 @@ void MainForm::readPingOutput() {
     qDebug() << __func__ << "," << __LINE__ << "output is:";
     QString output = pingProcess->readAllStandardOutput();
     qDebug() << __func__ << "," << __LINE__ << "output is:" << output;
-    pingOutputTextEdit->append(output);
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString outputWithTimestamp = QString("[%1] %2").arg(timestamp, output);
+    pingOutputTextEdit->append(outputWithTimestamp);
 
     // Parse ping output to determine whether the device is online
     if (output.contains("Destination Host Unreachable") || output.contains("Request timed out") || output.contains("100% packet loss")) {
@@ -1325,6 +1328,7 @@ void MainForm::readPingOutput() {
         onlineStatusLabel->setStyleSheet("QLabel { color : green; }");
     }
 }
+
 
 
 void MainForm::handleError(QProcess::ProcessError error) {
