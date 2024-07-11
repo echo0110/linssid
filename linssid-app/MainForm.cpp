@@ -1285,14 +1285,17 @@ void MainForm::startPing() {
     QString gateway = gatewayLineEdit->text();
     if (gateway.isEmpty()) {
         onlineStatusLabel->setText("No gateway set");
+        onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
         return;
     }
-    QString command = QString("ping %1").arg(gateway); // 不指定次数，持续ping
+    QString command = QString("ping -w 5 %1").arg(gateway); // 设置超时为5秒
     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
     pingProcess->start(command);
 
     if (!pingProcess->waitForStarted()) {
         qDebug() << "Failed to start ping process.";
+        onlineStatusLabel->setText("Failed to start ping process");
+        onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
         return;
     } else {
         qDebug() << "Ping process started successfully.";
@@ -1321,4 +1324,14 @@ void MainForm::handleError(QProcess::ProcessError error) {
     qDebug() << "Error occurred:" << error;
     onlineStatusLabel->setText("Ping process error: " + QString::number(error));
     onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+}
+
+// 新增一个函数用于重新开始ping
+void MainForm::restartPing() {
+    // 先停止当前的ping进程
+    pingProcess->kill();
+    pingProcess->waitForFinished();
+
+    // 重新开始ping
+    startPing();
 }
