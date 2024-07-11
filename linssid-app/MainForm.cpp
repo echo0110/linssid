@@ -180,17 +180,23 @@ MainForm::MainForm() {
         qDebug() << "Connection failed.";
     }
 
+    // 连接按钮点击信号到 startPing 槽
+    connect(pingButton, &QPushButton::clicked, this, &MainForm::restartPing);
+
+
+   
+
     // Check for errors
     connect(pingProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(handleError(QProcess::ProcessError)));
 
-    // connect(pingProcess, &QProcess::readyReadStandardOutput, this, &MainForm::readPingOutput);
+    
 
     // Initialize QProcess for network info
     networkInfoProcess = new QProcess(this);
     connect(networkInfoProcess, &QProcess::readyReadStandardOutput, this, &MainForm::updateNetworkInfo);
 
-    // Connect button click to startPing function
-    connect(pingButton, &QPushButton::clicked, this, &MainForm::startPing);
+    // // Connect button click to startPing function
+    // connect(pingButton, &QPushButton::clicked, this, &MainForm::startPing);
 
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
@@ -1288,7 +1294,8 @@ void MainForm::startPing() {
         onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
         return;
     }
-    QString command = QString("ping -w 5 %1").arg(gateway); // 设置超时为5秒
+    //QString command = QString("ping -w 5 %1").arg(gateway); // 设置超时为5秒
+    QString command = QString("ping %1").arg(gateway); //
     qDebug() << __func__ << "," << __LINE__ << "- Gateway:" << gateway;
     pingProcess->start(command);
 
@@ -1326,12 +1333,9 @@ void MainForm::handleError(QProcess::ProcessError error) {
     onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
 }
 
-// 新增一个函数用于重新开始ping
+// 
 void MainForm::restartPing() {
-    // 先停止当前的ping进程
     pingProcess->kill();
     pingProcess->waitForFinished();
-
-    // 重新开始ping
     startPing();
 }

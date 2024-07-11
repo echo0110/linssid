@@ -93,6 +93,7 @@ public slots:
     void readPingOutput();
     void updateNetworkInfo();
     void startPing();
+    void restartPing();
     void handleError(QProcess::ProcessError error);
 private:
     Ui::mainForm mainFormWidget;
