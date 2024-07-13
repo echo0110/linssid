@@ -1302,7 +1302,8 @@ void MainForm::startPing() {
     if (!pingProcess->waitForStarted()) {
         qDebug() << "Failed to start ping process.";
         onlineStatusLabel->setText("Failed to start ping process");
-        onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+        //onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+        onlineStatusLabel->setStyleSheet("QLabel { color : red; font-size: 20pt; font-weight: bold; }");
         return;
     } else {
         qDebug() << "Ping process started successfully.";
@@ -1322,10 +1323,10 @@ void MainForm::readPingOutput() {
     // Parse ping output to determine whether the device is online
     if (output.contains("Destination Host Unreachable") || output.contains("Request timed out") || output.contains("100% packet loss")) {
         onlineStatusLabel->setText("Device is offline");
-        onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+        onlineStatusLabel->setStyleSheet("QLabel { color : red; font-size: 20pt; font-weight: bold; }");
     } else {
         onlineStatusLabel->setText("Device is online");
-        onlineStatusLabel->setStyleSheet("QLabel { color : green; }");
+        onlineStatusLabel->setStyleSheet("QLabel { color : green; font-size: 20pt; font-weight: bold; }");
     }
 }
 
@@ -1334,7 +1335,7 @@ void MainForm::readPingOutput() {
 void MainForm::handleError(QProcess::ProcessError error) {
     qDebug() << "Error occurred:" << error;
     onlineStatusLabel->setText("Ping process error: " + QString::number(error));
-    onlineStatusLabel->setStyleSheet("QLabel { color : red; }");
+    onlineStatusLabel->setStyleSheet("QLabel { color : red; font-size: 20pt; font-weight: bold; }");
 }
 
 // 
