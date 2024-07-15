@@ -1351,13 +1351,17 @@ void MainForm::restartPing() {
 
 
 void MainForm::onTableDoubleClicked(const QModelIndex &index) {
-    QString bssid = model_->item(index.row(), BSSID_COLUMN_INDEX)->text();
+   // QString bssid = proxyModel_->item(index.row(), BSSID_COLUMN_INDEX)->text();
+    QModelIndex sourceIndex = proxyModel_->mapToSource(index);
+    QString ssid = model_->item(sourceIndex.row(), SSID_COLUMN_INDEX)->text(); 
+    QString bssid = model_->item(sourceIndex.row(), BSSID_COLUMN_INDEX)->text();
     bool ok;
     QString password = QInputDialog::getText(this, tr("Connect to Wi-Fi"),
                                              tr("Enter password for BSSID: %1").arg(bssid),
                                              QLineEdit::Password, "", &ok);
     if (ok && !password.isEmpty()) {
-        connectToWifi(bssid, password);
+        //connectToWifi(bssid, password);
+        connectToWifi_wpa(ssid, bssid, password);
     }
 }
 
@@ -1377,7 +1381,45 @@ void MainForm::onConnectButtonClicked(const QString& ssid, const QString& bssid,
     }
 }
 
-void MainForm::connectToWifi(const QString &bssid, const QString &password) {
-    QString command = QString("nmcli d wifi connect %1 password %2").arg(bssid).arg(password);
-    QProcess::execute(command);
+// void MainForm::connectToWifi(const QString &bssid, const QString &password) {
+//     QString command = QString("nmcli d wifi connect %1 password %2").arg(bssid).arg(password);
+//     QProcess::execute(command);
+// }
+void MainForm::connectToWifi_wpa(const QString& ssid, const QString& bssid, const QString& password) {
+    // 连接到指定的 WiFi
+    QProcess process;
+    
+    // 添加一个新的网络
+    process.start("wpa_cli add_network");
+    process.waitForFinished();
+    QString output(process.readAllStandardOutput());
+    int networkId = output.trimmed().toInt();
+    
+    // 设置网络的 SSID
+    process.start(QString("wpa_cli set_network %1 ssid '\"%2\"'").arg(networkId).arg(ssid));
+    process.waitForFinished();
+    
+    // 设置网络的 BSSID
+    process.start(QString("wpa_cli set_network %1 bssid %2").arg(networkId).arg(bssid));
+    process.waitForFinished();
+    
+    // 设置网络的密码
+    process.start(QString("wpa_cli set_network %1 psk '\"%2\"'").arg(networkId).arg(password));
+    process.waitForFinished();
+    
+    // 启用网络
+    process.start(QString("wpa_cli enable_network %1").arg(networkId));
+    process.waitForFinished();
+    
+    // 选择网络
+    process.start(QString("wpa_cli select_network %1").arg(networkId));
+    process.waitForFinished();
+    
+    QString errorOutput(process.readAllStandardError());
+    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
+        QMessageBox::information(this, "连接结果", "连接成功!");
+    } else {
+        QMessageBox::critical(this, "连接结果", QString("连接失败!\n错误信息: %1").arg(errorOutput));
+    }
 }
+

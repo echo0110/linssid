@@ -100,7 +100,8 @@ public slots:
     // //void onMainTableViewDoubleClicked(const QModelIndex &index);
     void onConnectButtonClicked(const QString& ssid, const QString& bssid, const QString& password);
     void onTableDoubleClicked(const QModelIndex &index);
-    void connectToWifi(const QString &bssid, const QString &password);
+    //void connectToWifi(const QString &bssid, const QString &password);
+    void connectToWifi_wpa(const QString& ssid, const QString& bssid, const QString& password);
 private:
     Ui::mainForm mainFormWidget;
     void customEvent(QEvent*) override;
@@ -150,6 +151,7 @@ private:
     //QTableWidget *wifiTable;
     //void connectToWifi(const QString &ssid, const QString &password);
     static const int BSSID_COLUMN_INDEX = 2;
+    static const int SSID_COLUMN_INDEX = 1;
     
 };
 
