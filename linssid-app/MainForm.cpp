@@ -117,6 +117,9 @@ MainForm::MainForm() {
 
     mainFormWidget.setupUi(this);
 
+
+   
+
      // Create QLabel for online status
     onlineStatusLabel = new QLabel(this);
     onlineStatusLabel->setObjectName("onlineStatusLabel");
@@ -195,8 +198,9 @@ MainForm::MainForm() {
     networkInfoProcess = new QProcess(this);
     connect(networkInfoProcess, &QProcess::readyReadStandardOutput, this, &MainForm::updateNetworkInfo);
 
-    // // Connect button click to startPing function
-    // connect(pingButton, &QPushButton::clicked, this, &MainForm::startPing);
+    // connect(ui->mainTableView, &QTableView::doubleClicked, this, &MainForm::onMainTableViewDoubleClicked);
+    // connect(this, &MainForm::connectToWifi, this, &MainForm::onConnectButtonClicked);
+    connect(mainFormWidget.mainTableView, &QTableView::doubleClicked, this, &MainForm::onTableDoubleClicked);
 
     // Button widget actions
     connect(mainFormWidget.runBtn, SIGNAL(clicked()), this, SLOT(doRun()));
@@ -1343,4 +1347,37 @@ void MainForm::restartPing() {
     pingProcess->kill();
     pingProcess->waitForFinished();
     startPing();
+}
+
+
+void MainForm::onTableDoubleClicked(const QModelIndex &index) {
+    QString bssid = model_->item(index.row(), BSSID_COLUMN_INDEX)->text();
+    bool ok;
+    QString password = QInputDialog::getText(this, tr("Connect to Wi-Fi"),
+                                             tr("Enter password for BSSID: %1").arg(bssid),
+                                             QLineEdit::Password, "", &ok);
+    if (ok && !password.isEmpty()) {
+        connectToWifi(bssid, password);
+    }
+}
+
+
+void MainForm::onConnectButtonClicked(const QString& ssid, const QString& bssid, const QString& password) {
+    // 连接到指定的 WiFi
+    QString command = QString("nmcli dev wifi connect %1 password %2 bssid %3").arg(ssid).arg(password).arg(bssid);
+    QProcess process;
+    process.start(command);
+    process.waitForFinished();
+    QString output(process.readAllStandardOutput());
+    QString errorOutput(process.readAllStandardError());
+    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
+        QMessageBox::information(this, "连接结果", "连接成功!");
+    } else {
+        QMessageBox::critical(this, "连接结果", QString("连接失败!\n错误信息: %1").arg(errorOutput));
+    }
+}
+
+void MainForm::connectToWifi(const QString &bssid, const QString &password) {
+    QString command = QString("nmcli d wifi connect %1 password %2").arg(bssid).arg(password);
+    QProcess::execute(command);
 }

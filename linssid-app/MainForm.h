@@ -95,6 +95,12 @@ public slots:
     void startPing();
     void restartPing();
     void handleError(QProcess::ProcessError error);
+    //void onWifiDoubleClicked(int row, int column);
+    // void connectToWifi(const QString &ssid, const QString &password);
+    // //void onMainTableViewDoubleClicked(const QModelIndex &index);
+    void onConnectButtonClicked(const QString& ssid, const QString& bssid, const QString& password);
+    void onTableDoubleClicked(const QModelIndex &index);
+    void connectToWifi(const QString &bssid, const QString &password);
 private:
     Ui::mainForm mainFormWidget;
     void customEvent(QEvent*) override;
@@ -141,6 +147,10 @@ private:
     QLabel *ssidLabel;
     QLabel *bssidLabel;
     QString wirelessInterface;
+    //QTableWidget *wifiTable;
+    //void connectToWifi(const QString &ssid, const QString &password);
+    static const int BSSID_COLUMN_INDEX = 2;
+    
 };
 
 #endif	/* _MAINFORM_H */
